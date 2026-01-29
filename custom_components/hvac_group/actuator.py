@@ -87,6 +87,14 @@ class HvacGroupActuator:
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set the HVAC mode on an actuator."""
+        if hvac_mode == HVACMode.OFF:
+            current_mode = self.state.state
+            if current_mode in (HVACMode.OFF, "off"):
+                LOGGER.debug(
+                    "Skipping OFF for %s (already off)",
+                    self.entity_id,
+                )
+                return
         await self._set_commit_action(
             create_coro(
                 self._async_call_climate_service,
@@ -142,17 +150,18 @@ class HvacGroupActuator:
                     temperature, target_temp_low, target_temp_high
                 )
             }
-
+        
         if hvac_mode is not None:
-            if hvac_mode == HVACMode.OFF:
-                current_mode = self.state.state
-                if current_mode in (HVACMode.OFF, "off"):
-                    LOGGER.debug(
-                        "Skipping OFF for %s (already off)",
-                        self.entity_id,
-                    )
-                else:
-                    data.update({ATTR_HVAC_MODE: hvac_mode})
+                data.update({ATTR_HVAC_MODE: hvac_mode})
+
+        if hvac_mode == HVACMode.OFF:
+            current_mode = self.state.state
+            if current_mode in (HVACMode.OFF, "off"):
+                LOGGER.debug(
+                    "Skipping OFF for %s (already off)",
+                    self.entity_id,
+                )
+                return
 
         await self._set_commit_action(
             create_coro(
