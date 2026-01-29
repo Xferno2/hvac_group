@@ -21,6 +21,7 @@ from homeassistant.helpers.schema_config_entry_flow import (
 
 from .const import (
     CONF_CURRENT_TEMPERATURE_ENTITY_ID,
+    CONF_CURRENT_HUMIDITY_ENTITY_ID,
     CONF_COOLERS,
     CONF_HEATERS,
     CONF_HIDE_MEMBERS,
@@ -47,6 +48,16 @@ OPTIONS_SCHEMA = {
                 selector.EntityFilterSelectorConfig(domain=CLIMATE_DOMAIN),
             ]
         )
+    ),
+    vol.Optional(CONF_CURRENT_HUMIDITY_ENTITY_ID): selector.EntitySelector(
+    selector.EntitySelectorConfig(
+        filter=[
+            selector.EntityFilterSelectorConfig(
+                domain=SENSOR_DOMAIN,
+                device_class=SensorDeviceClass.HUMIDITY,
+            )
+        ]
+    )
     ),
     vol.Required(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
 }

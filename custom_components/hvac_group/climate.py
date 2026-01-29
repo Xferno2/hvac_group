@@ -211,7 +211,6 @@ class HvacGroupClimateEntity(ClimateEntity, RestoreEntity):
         self._are_heaters_active = False
 
         self._current_temperature: float | None = None
-
         self._min_temp = min_temp or TemperatureConverter.convert(
             DEFAULT_MIN_TEMP, UnitOfTemperature.CELSIUS, self.temperature_unit
         )
