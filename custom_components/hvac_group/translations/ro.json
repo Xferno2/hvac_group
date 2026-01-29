@@ -11,8 +11,7 @@
           "coolers": "Elemente de răcire",
           "toggle_coolers": "Pornește sau oprește elementele de răcire în funcție de temperatura ambientală",
           "hide_members": "Ascunde membrii",
-          "temperature_entity_id": "Senzor de temperatură",
-          "current_humidity_entity_id": "Senzor de umiditate"
+          "temperature_entity_id": "Senzor de temperatură"
         }
       }
     }
@@ -27,8 +26,7 @@
           "coolers": "Elemente de răcire",
           "toggle_coolers": "Pornește sau oprește elementele de răcire în funcție de temperatura ambientală",
           "hide_members": "Ascunde membrii",
-          "temperature_entity_id": "Senzor de temperatură",
-          "current_humidity_entity_id": "Senzor de umiditate"
+          "temperature_entity_id": "Senzor de temperatură"
         }
       }
     }

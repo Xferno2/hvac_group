@@ -299,33 +299,25 @@ class HvacGroupClimateEntity(ClimateEntity, RestoreEntity):
         return super().precision
 
     @property
-    def target_temperature_low(self) -> float | None:
-        if self._hvac_mode == HVACMode.HEAT_COOL:
+    def target_temperature_low(self) -> float:
+        """Return the low temperature we try to reach."""
+        if self._target_temp_low is not None:
             return self._target_temp_low
         return None
 
     @property
-    def target_temperature_high(self) -> float | None:
-        if self._hvac_mode == HVACMode.HEAT_COOL:
+    def target_temperature_high(self) -> float:
+        """Return the high temperature we try to reach."""
+        if self._target_temp_high is not None:
             return self._target_temp_high
         return None
 
     @property
-    def target_temperature(self) -> float | None:
-        if self._hvac_mode == HVACMode.HEAT:
-            return self._target_temp_low
-        elif self._hvac_mode == HVACMode.COOL:
-            return self._target_temp_high
+    def target_temperature(self) -> float:
+        """Return the target temperature we try to reach."""
+        if self._target_temperature is not None:
+            return self._target_temperature
         return None
-    
-    @property
-    def supported_features(self) -> int:
-        """Return the supported features based on current HVAC mode."""
-        if self._hvac_mode == HVACMode.HEAT_COOL:
-            return ClimateEntityFeature.TARGET_TEMPERATURE_RANGE
-        elif self._hvac_mode in (HVACMode.HEAT, HVACMode.COOL):
-            return ClimateEntityFeature.TARGET_TEMPERATURE
-        return 0
 
     @property
     def target_temperature_step(self) -> float:
@@ -1019,22 +1011,13 @@ class HvacGroupClimateEntity(ClimateEntity, RestoreEntity):
         temp = kwargs.get(ATTR_TEMPERATURE)
         hvac_mode = kwargs.get(ATTR_HVAC_MODE)
 
-        # Set temperatures only relevant to current HVAC mode
-        if self._hvac_mode == HVACMode.HEAT_COOL:
-            if temp_low is not None:
-                self._target_temp_low = temp_low
-            if temp_high is not None:
-                self._target_temp_high = temp_high
-            self._target_temperature = None
-        elif self._hvac_mode == HVACMode.HEAT:
-            if temp is not None:
-                self._target_temp_low = temp
-            self._target_temp_high = None
-            self._target_temperature = temp
-        elif self._hvac_mode == HVACMode.COOL:
-            if temp is not None:
-                self._target_temp_high = temp
-            self._target_temp_low = None
+        if temp_low is not None:
+            self._target_temp_low = temp_low
+
+        if temp_high is not None:
+            self._target_temp_high = temp_high
+
+        if temp is not None:
             self._target_temperature = temp
 
         if hvac_mode is not None:
@@ -1045,7 +1028,12 @@ class HvacGroupClimateEntity(ClimateEntity, RestoreEntity):
 
         LOGGER.debug(
             "Setting temperature (%s) on HVAC group %s",
-            (f"{self._target_temp_low}-{self._target_temp_high}" if self._hvac_mode == HVACMode.HEAT_COOL else f"{self.target_temperature}"),
+            (
+                f"{temp_low}-{temp_high}"
+                if ClimateEntityFeature.TARGET_TEMPERATURE_RANGE
+                & self._attr_supported_features
+                else f"{temp}"
+            ),
             self.entity_id,
         )
 
