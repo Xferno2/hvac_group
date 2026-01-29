@@ -127,15 +127,6 @@ class HvacGroupActuator:
                 self.entity_id,
             )
             return
-        
-        if hvac_mode == HVACMode.OFF:
-            current_mode = self.state.state
-            if current_mode in (HVACMode.OFF, "off"):
-                LOGGER.debug(
-                    "Skipping OFF for %s (already off)",
-                    self.entity_id,
-                )
-                return
 
         data = {}
         if ClimateEntityFeature.TARGET_TEMPERATURE_RANGE & self.state.attributes.get(
@@ -153,7 +144,15 @@ class HvacGroupActuator:
             }
 
         if hvac_mode is not None:
-            data.update({ATTR_HVAC_MODE: hvac_mode})
+            if hvac_mode == HVACMode.OFF:
+                current_mode = self.state.state
+                if current_mode in (HVACMode.OFF, "off"):
+                    LOGGER.debug(
+                        "Skipping OFF for %s (already off)",
+                        self.entity_id,
+                    )
+                else:
+                    data.update({ATTR_HVAC_MODE: hvac_mode})
 
         await self._set_commit_action(
             create_coro(
